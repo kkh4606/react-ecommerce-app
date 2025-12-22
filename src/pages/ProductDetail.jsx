@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useContext } from "react";
+
+import { CartContext } from "../contexts/CartContext";
 
 function ProductDetail() {
   let { id } = useParams();
   let [product, setProduct] = useState(null);
   let [quantity, setQuantity] = useState(1);
+
+  let { count, setCount } = useContext(CartContext);
   let navigate = useNavigate();
 
   let getProductDetail = async () => {
@@ -19,9 +24,43 @@ function ProductDetail() {
       const data = await response.json();
       setProduct(data.product);
     } catch (error) {
-      console.error("Error fetching product:", error);
       navigate("*");
     }
+  };
+
+  let { cartItems, setCartItems } = useContext(CartContext);
+
+  let addToCart = () => {
+    let newItems = {
+      ...product,
+      quantity,
+    };
+
+    let existingitem = cartItems.find((item) => item.id === newItems.id);
+
+    if (existingitem) {
+      existingitem.quantity += quantity;
+      setCartItems([...cartItems]);
+
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+
+      navigate("/checkout");
+    } else {
+      let updatedItems = [...cartItems, newItems];
+      setCartItems(updatedItems);
+      localStorage.setItem("cartItems", JSON.stringify(updatedItems));
+
+      navigate("/checkout");
+    }
+
+    let orders = JSON.parse(localStorage.getItem("cartItems"));
+
+    const total = orders.reduce(
+      (accumulator, currentValue) => accumulator + currentValue.quantity,
+      0
+    );
+
+    setCount(total);
   };
 
   useEffect(() => {
@@ -45,9 +84,7 @@ function ProductDetail() {
                   <div className="relative bg-white rounded-2xl shadow-xl p-6">
                     <img
                       src={
-                        product.images && product.images.length > 0
-                          ? product.images[0].url
-                          : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSaanNHkH2UQYCzyN0i-jO3g2Ct_4I-KsWylQ&s"
+                        "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiHE-qu-vewMygdO0u-WeWYT-X0sWoT0020Wqlx6vQE8B8Q97MNLANzTGq_CYn27uz4qffFiqcuExX953AbySn4s93jvL2zaosu24xj_R1fq1RfzAfJCJ0n91QKEzlbL0hEKvMMc0OVTSQ-/s1600/pes-2018-faces+%252810%2529.jpg"
                       }
                       alt={product.name}
                       className="w-full h-80 object-contain rounded-lg"
@@ -165,7 +202,10 @@ function ProductDetail() {
 
                 {/* Add to Cart Button */}
                 <div className="space-y-4">
-                  <button className="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-purple-700 hover:from-blue-700 hover:via-blue-800 hover:to-purple-800 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg flex items-center justify-center text-lg">
+                  <button
+                    onClick={addToCart}
+                    className="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-purple-700 hover:from-blue-700 hover:via-blue-800 hover:to-purple-800 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg flex items-center justify-center text-lg"
+                  >
                     <svg
                       className="w-6 h-6 mr-3"
                       fill="none"

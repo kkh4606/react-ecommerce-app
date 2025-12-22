@@ -6,6 +6,7 @@ import Notfound from "../componments/Notfound.jsx";
 import Register from "../componments/Register.jsx";
 import Login from "../componments/Login.jsx";
 import Checkout from "../componments/Checkout.jsx";
+import Test from "../componments/Test.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
       {
         path: "/checkout",
         Component: Checkout,
+      },
+      {
+        path: "/test",
+        Component: Test,
       },
       {
         path: "*",

@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import ProductCard from "../componments/ProductCard";
-import { CardContext } from "../contexts/CartContext";
+import { CartContext } from "../contexts/CartContext";
 
 function App() {
-  let { products } = useContext(CardContext);
+  let { products } = useContext(CartContext);
   if (products.length === 0) {
     return <div>Loading...</div>;
   }

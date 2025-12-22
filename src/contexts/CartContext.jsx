@@ -1,11 +1,15 @@
 import { createContext } from "react";
-import { useState } from "react";
-import { useEffect } from "react";
-let CardContext = createContext();
+import { useEffect, useState } from "react";
+
+let CartContext = createContext();
 
 let CartContextProvider = ({ children }) => {
+  // get all productss
   const [products, setProducts] = useState([]);
 
+  let [count, setCount] = useState(0);
+
+  // fetch all products data
   let getProducts = async () => {
     await fetch("http://localhost:9000/api/products")
       .then((response) => response.json())
@@ -14,28 +18,40 @@ let CartContextProvider = ({ children }) => {
       });
   };
 
-  let getProductDetail = async () => {
-    try {
-      const response = await fetch(`http://localhost:9000/api/products/${id}`);
+  const [cartItems, setCartItems] = useState([]);
 
-      if (response.status === 404) {
-        navigate("*");
-        return;
+  let getItems = () => {
+    const savedCart = localStorage.getItem("cartItems");
+    if (savedCart) {
+      setCartItems(JSON.parse(savedCart));
+
+      let items = JSON.parse(savedCart);
+
+      let totals = 0;
+
+      for (let item of items) {
+        totals += item.quantity;
       }
 
-      const data = await response.json();
-      setProduct(data.product);
-    } catch (error) {
-      console.error("Error fetching product:", error);
-      navigate("*");
+      setCount(totals);
     }
   };
+
+  useEffect(() => {
+    getItems();
+  }, [count]);
 
   useEffect(() => {
     getProducts();
   }, []);
 
-  return <CardContext value={{ products }}>{children}</CardContext>;
+  return (
+    <CartContext.Provider
+      value={{ products, cartItems, setCartItems, count, setCount }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
 };
 
-export { CardContext, CartContextProvider };
+export { CartContext, CartContextProvider };
