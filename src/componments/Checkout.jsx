@@ -1,13 +1,23 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+
+import { Link, useNavigate } from "react-router";
 
 import { CartContext } from "../contexts/CartContext";
+import axios from "axios";
 
 function Checkout() {
   let { cartItems, setCartItems } = useContext(CartContext);
 
   let { setCount } = useContext(CartContext);
 
-  // Calculate totals
+  let [order_products, setOrderProducts] = useState([]);
+
+  let [shipping_address, setShippingAddress] = useState("");
+  let [note, setNote] = useState("");
+  let [screenshot, setScreenshot] = useState("");
+
+  let navigate = useNavigate();
+
   const subtotal = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0
@@ -16,7 +26,6 @@ function Checkout() {
   const tax = 0; // No tax for now
   const total = subtotal + shipping + tax;
 
-  // Quantity control functions
   const increaseQuantity = (productId) => {
     let items = cartItems.map((item) => {
       if (item.id === productId) {
@@ -30,6 +39,8 @@ function Checkout() {
 
     setCartItems(items);
     localStorage.setItem("cartItems", JSON.stringify(items));
+
+    setCount(items.reduce((t, v) => t + v.quantity, 0));
   };
 
   const decreaseQuantity = (productId) => {
@@ -45,6 +56,7 @@ function Checkout() {
 
     setCartItems(items);
     localStorage.setItem("cartItems", JSON.stringify(items));
+    setCount(items.reduce((t, v) => t + v.quantity, 0));
   };
 
   let orderItems = () => {
@@ -70,10 +82,48 @@ function Checkout() {
 
     return;
   };
+
+  let createOrders = async () => {
+    try {
+      let orders = {
+        total_amount: total,
+        order_products,
+        shipping_address: shipping_address,
+        notes: note,
+        screen_shot: "",
+      };
+
+      let res = await axios.post("http://localhost:9000/api/orders", orders, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (res.data.message === "order create successful.") {
+        setCartItems([]);
+        localStorage.setItem("cartItems", JSON.stringify([]));
+        setCount(0);
+        navigate("/orders");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
   useEffect(() => {
     orderItems();
   }, []);
 
+  useEffect(() => {
+    let customer_order = cartItems.map((item) => {
+      return { product_id: item.id, quantity: item.quantity };
+    });
+
+    setOrderProducts(customer_order);
+  }, [cartItems]);
+
+  if (cartItems.length == 0) {
+    return <p>No items</p>;
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12">
       <div className="container mx-auto px-6 max-w-6xl">
@@ -107,17 +157,15 @@ function Checkout() {
                   >
                     {/* Product Image */}
                     <div className="w-24 h-24 bg-gray-200 rounded-xl flex-shrink-0 overflow-hidden shadow-sm">
-                      <img
-                        src={
-                          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnpjDvjhef5pAzuvGqklGQa2ZVoVliAiaeQg&s"
-                        }
-                        alt={item.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.src =
-                            "https://via.placeholder.com/150x150?text=No+Image";
-                        }}
-                      />
+                      <Link to={`/products/${item.id}`}>
+                        <img
+                          src={
+                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnpjDvjhef5pAzuvGqklGQa2ZVoVliAiaeQg&s"
+                          }
+                          alt={item.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </Link>
                     </div>
 
                     {/* Product Details */}
@@ -218,7 +266,51 @@ function Checkout() {
                 </div>
               </div>
 
-              <button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-xl mt-8 transition-all duration-300 transform hover:scale-105 shadow-lg">
+              {/* Additional Fields */}
+              <div className="space-y-4 mt-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Shipping Address
+                  </label>
+                  <input
+                    type="text"
+                    value={shipping_address}
+                    onChange={(e) => setShippingAddress(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                    placeholder="Enter your shipping address"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Note
+                  </label>
+                  <textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 resize-none"
+                    rows="3"
+                    placeholder="Add any special notes for your order"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Screenshot
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setScreenshot(e.target.files[0])}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-l-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={createOrders}
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-xl mt-8 transition-all duration-300 transform hover:scale-105 shadow-lg"
+              >
                 Complete Purchase
               </button>
 
