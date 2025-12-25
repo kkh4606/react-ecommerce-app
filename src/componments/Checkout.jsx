@@ -87,7 +87,7 @@ function Checkout() {
     try {
       let orders = {
         total_amount: total,
-        order_products,
+        order_products: order_products,
         shipping_address: shipping_address,
         notes: note,
         screen_shot: "",
@@ -98,6 +98,8 @@ function Checkout() {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
+
+      console.log(res.data.order);
 
       if (res.data.message === "order create successful.") {
         setCartItems([]);

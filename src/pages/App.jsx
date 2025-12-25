@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import ProductCard from "../componments/ProductCard";
 import { CartContext } from "../contexts/CartContext";
+import Memoeexample from "../componments/memoeexample";
 
 function App() {
   let { products } = useContext(CartContext);
@@ -9,14 +10,16 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* <NavBar filterProductsBySearch={filterProductsBySearch} /> */}
-      <div className="py-8">
-        <div className="container mx-auto px-4">
-          <ProductCard products={products} />
+    <>
+      <Memoeexample />
+      <div className="min-h-screen bg-gray-100">
+        <div className="py-8">
+          <div className="container mx-auto px-4">
+            <ProductCard products={products} />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

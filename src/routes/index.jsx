@@ -8,6 +8,8 @@ import Login from "../componments/Login.jsx";
 import Checkout from "../componments/Checkout.jsx";
 import Test from "../componments/Test.jsx";
 import Orders from "../pages/Orders.jsx";
+import AdminLayout from "../componments/AdminLayout.jsx";
+import UserOrder from "../componments/UserOrder.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -49,6 +51,16 @@ const router = createBrowserRouter([
       {
         path: "*",
         Component: Notfound,
+      },
+    ],
+  },
+  {
+    path: "/admin",
+    Component: AdminLayout,
+    children: [
+      {
+        path: "/admin/orders",
+        Component: UserOrder,
       },
     ],
   },
