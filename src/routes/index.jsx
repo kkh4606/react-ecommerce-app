@@ -1,4 +1,8 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
 import App from "../pages/App.jsx";
 import Layout from "../componments/Layout.jsx";
 import ProductDetail from "../pages/ProductDetail.jsx";
@@ -10,6 +14,7 @@ import Test from "../componments/Test.jsx";
 import Orders from "../pages/Orders.jsx";
 import AdminLayout from "../componments/AdminLayout.jsx";
 import UserOrder from "../componments/UserOrder.jsx";
+import ProtectedRoute from "../componments/PortectedRoute.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -56,11 +61,15 @@ const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    Component: AdminLayout,
+    element: <AdminLayout />,
     children: [
       {
-        path: "/admin/orders",
-        Component: UserOrder,
+        path: "orders",
+        element: () => (
+          <ProtectedRoute>
+            <UserOrder />
+          </ProtectedRoute>
+        ),
       },
     ],
   },

@@ -6,7 +6,7 @@ import { CartContext } from "../contexts/CartContext";
 
 function NavBar({ filterProductsBySearch }) {
   let { user, userLogout } = useContext(AuthContext);
-  let { cartItems, count } = useContext(CartContext);
+  let { cartItems, count, total } = useContext(CartContext);
 
   return (
     <nav className="bg-white shadow-md">
@@ -95,7 +95,7 @@ function NavBar({ filterProductsBySearch }) {
               >
                 <div className="relative">
                   <p className="absolute top-[-30px] right-[1px] text-[red] font-bold text-3xl">
-                    {count}
+                    {/* {count} */} {total}
                   </p>
                   <svg
                     className="w-6 h-6"

@@ -11,8 +11,7 @@ export default function Orders() {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
-      .then((res) => setOrders(res.data.orders))
-      .catch(console.log);
+      .then((res) => setOrders(res.data.orders || []));
   }, []);
 
   const statusStyle = (status) => {

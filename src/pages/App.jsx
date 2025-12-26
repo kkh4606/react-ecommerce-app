@@ -11,7 +11,7 @@ function App() {
 
   return (
     <>
-      <Memoeexample />
+      {/* <Memoeexample /> */}
       <div className="min-h-screen bg-gray-100">
         <div className="py-8">
           <div className="container mx-auto px-4">

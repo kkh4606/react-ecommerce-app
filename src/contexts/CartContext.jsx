@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext, useMemo } from "react";
 import { useEffect, useState } from "react";
 
 let CartContext = createContext();
@@ -20,11 +20,11 @@ let CartContextProvider = ({ children }) => {
 
   const [cartItems, setCartItems] = useState([]);
 
-  let getItems = () => {
+  let total = useMemo(() => {
     const savedCart = localStorage.getItem("cartItems");
-    if (savedCart) {
-      setCartItems(JSON.parse(savedCart));
 
+    if (!savedCart) return 0;
+    if (savedCart) {
       let items = JSON.parse(savedCart);
 
       let totals = 0;
@@ -33,13 +33,9 @@ let CartContextProvider = ({ children }) => {
         totals += item.quantity;
       }
 
-      setCount(totals);
+      return totals;
     }
-  };
-
-  useEffect(() => {
-    getItems();
-  }, [count]);
+  }, [cartItems]);
 
   useEffect(() => {
     getProducts();
@@ -47,7 +43,7 @@ let CartContextProvider = ({ children }) => {
 
   return (
     <CartContext.Provider
-      value={{ products, cartItems, setCartItems, count, setCount }}
+      value={{ products, cartItems, setCartItems, count, setCount, total }}
     >
       {children}
     </CartContext.Provider>

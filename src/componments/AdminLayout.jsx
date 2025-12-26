@@ -4,39 +4,6 @@ import { useEffect, useState } from "react";
 import SideBar from "./SideBar";
 
 export default function AdminLayout() {
-  const products = [
-    {
-      name: "Gray cap for man",
-      size: "S, M, L",
-      price: "$80.00",
-      stock: "428 Item left",
-      sold: "150 Sold",
-      category: "Cap",
-      rating: "4.5",
-      reviews: "55 Review",
-    },
-    {
-      name: "Woman Dress",
-      size: "S, M, L, XL",
-      price: "$80.00",
-      stock: "567 Item left",
-      sold: "345 Sold",
-      category: "Fashion",
-      rating: "4.9",
-      reviews: "50 Review",
-    },
-    {
-      name: "Olive leather",
-      size: "S, M",
-      price: "$136.00",
-      stock: "247 Item left",
-      sold: "79 Sold",
-      category: "Hand Bag",
-      rating: "4.5",
-      reviews: "45 Review",
-    },
-  ];
-
   let [orders, setOrders] = useState([]);
 
   useEffect(() => {
@@ -48,10 +15,6 @@ export default function AdminLayout() {
       })
       .then((res) => setOrders(res.data.orders));
   }, []);
-
-  useEffect(() => {
-    console.log(orders);
-  });
 
   return (
     <>
