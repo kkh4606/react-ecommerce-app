@@ -1,8 +1,4 @@
-import {
-  createBrowserRouter,
-  Navigate,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import App from "../pages/App.jsx";
 import Layout from "../componments/Layout.jsx";
 import ProductDetail from "../pages/ProductDetail.jsx";
@@ -12,9 +8,10 @@ import Login from "../componments/Login.jsx";
 import Checkout from "../componments/Checkout.jsx";
 import Test from "../componments/Test.jsx";
 import Orders from "../pages/Orders.jsx";
-import AdminLayout from "../componments/AdminLayout.jsx";
-import UserOrder from "../componments/UserOrder.jsx";
-import ProtectedRoute from "../componments/PortectedRoute.jsx";
+import AdminLayout from "../pages/admin/AdminLayout.jsx";
+import AdminProductCreate from "../pages/admin/AdminProductCreate.jsx";
+import AdminProducts from "../pages/admin/AdminProducts.jsx";
+import AdminOrderList from "../pages/admin/AdminOrderList.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -61,15 +58,22 @@ const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: <AdminLayout />,
+    Component: () => {
+      let isLoggedIn = localStorage.getItem("token");
+      return isLoggedIn ? <AdminLayout /> : <Navigate to={"/login"} />;
+    },
     children: [
       {
         path: "orders",
-        element: () => (
-          <ProtectedRoute>
-            <UserOrder />
-          </ProtectedRoute>
-        ),
+        Component: AdminOrderList,
+      },
+      {
+        path: "products",
+        Component: AdminProducts,
+      },
+      {
+        path: "products/create",
+        Component: AdminProductCreate,
       },
     ],
   },

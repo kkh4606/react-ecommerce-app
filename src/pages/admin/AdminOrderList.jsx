@@ -1,9 +1,7 @@
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { useEffect, useState } from "react";
 
-import SideBar from "./SideBar";
-
-export default function AdminLayout() {
+function AdminOrderList() {
   let [orders, setOrders] = useState([]);
 
   useEffect(() => {
@@ -18,8 +16,6 @@ export default function AdminLayout() {
 
   return (
     <>
-      <SideBar />
-
       <div className="p-4 sm:ml-64">
         <div className="p-4 border-1 border-default border-dashed rounded-base">
           <div className="shadow-lg rounded-lg overflow-hidden mx-4 md:mx-10">
@@ -82,3 +78,5 @@ export default function AdminLayout() {
     </>
   );
 }
+
+export default AdminOrderList;
