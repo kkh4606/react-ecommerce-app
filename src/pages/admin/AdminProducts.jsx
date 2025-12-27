@@ -80,7 +80,7 @@ function AdminProducts() {
 
                         <td className="py-4 px-6 border-b border-gray-200">
                           <Link
-                            to={"/admin/products/" + product.id + "/edit"}
+                            to={"/admin/products/edit/" + product.id}
                             className="bg-yellow-700 text-white py-1 px-2 rounded-md text-xs mr-2"
                           >
                             update

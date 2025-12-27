@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Errors from "../../componments/Errors";
-import { Navigate, useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 export default function AdminCreateProduct() {
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({
@@ -11,26 +11,48 @@ export default function AdminCreateProduct() {
     description: "",
   });
 
+  let { id } = useParams();
+
   const [error, setErrors] = useState(null);
 
   let navigate = useNavigate();
 
-  // fetch categories
-  useEffect(() => {
-    axios
-      .get("http://localhost:9000/api/categories")
-      .then((res) => setCategories(res.data.categories))
-      .catch(console.error);
-  }, []);
-
   const handleSubmit = async (e) => {
+    console.log("hello world");
     try {
       e.preventDefault();
-      let res = await axios.post("http://localhost:9000/api/products", form, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+
+      if (id) {
+        let res = await axios.put(
+          "http://localhost:9000/api/products/" + id,
+          form,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        if (res.data.errors) {
+          setErrors(res.data.errors);
+          return;
+        }
+
+        navigate("/admin/products");
+
+        return;
+      }
+
+      let res = await axios.post(
+        "http://localhost:9000/api/products",
+
+        form,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
       if (res.data.errors) {
         setErrors(res.data.errors);
@@ -47,9 +69,35 @@ export default function AdminCreateProduct() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  useEffect(() => {
+    axios
+      .get("http://localhost:9000/api/categories")
+      .then((res) => setCategories(res.data.categories))
+      .catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    if (!id) return;
+
+    axios
+      .get(`http://localhost:9000/api/products/${id}`)
+      .then((res) => {
+        const product = res.data.product;
+        setForm({
+          name: product.name ?? "",
+          price: product.price ?? "",
+          description: product.description ?? "",
+          category_id: product.category_id ?? "",
+        });
+      })
+      .catch(console.error);
+  }, [id]);
+
   return (
     <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold mb-6">Create Product</h2>
+      <h2 className="text-xl font-semibold mb-6">
+        {!id ? "Create Product" : "Update Product"}
+      </h2>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         {/* Name */}
@@ -99,7 +147,7 @@ export default function AdminCreateProduct() {
             ))}
           </select>
         </div>
-        <Errors error={error} name={"category"} />
+        <Errors error={error} name={"category_id"} />
 
         {/* Description */}
         <div>
@@ -116,7 +164,7 @@ export default function AdminCreateProduct() {
 
         {/* Submit */}
         <button className="w-full bg-black text-white py-2 rounded hover:bg-gray-800">
-          Create Product
+          {!id ? "Create Product" : "update"}
         </button>
       </form>
     </div>

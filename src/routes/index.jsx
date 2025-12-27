@@ -75,6 +75,11 @@ const router = createBrowserRouter([
         path: "products/create",
         Component: AdminProductCreate,
       },
+
+      {
+        path: "products/edit/:id",
+        Component: AdminProductCreate,
+      },
     ],
   },
 ]);
